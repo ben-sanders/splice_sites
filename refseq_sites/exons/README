@@ -1,0 +1,39 @@
+List of all RefSeq genes extracted from UCSC table browser 
+https://genome.ucsc.edu/cgi-bin/hgTables 
+table: ‘refGene’
+track: ‘RefSeq Genes’
+group: ‘Genes and Gene Predictions’
+
+converted to BED file using the ../../scripts/getrefseqexons.py Python script.
+Also filters the data:
+	One trancript per gene
+		Chooses transcript with the most exons
+	Removes the first and last exon boundaries - not splice sites
+	Annotates with type of site - donor or acceptor
+	checks orientation of gene and corrects site type
+	
+Initial BED files have only the split-junction position
+Want ~50bp flanking sequence either side.
+use bedtools slop to get this (flank extends out from start coordinate, slop
+includes it)
+
+bedtools slop -i <bedfile>.bed -g ../../reference_genome/hg19/hg19.genome -b 50 > slop.<bedfile>.bed
+
+-i = input BED file
+-g = reference .genome file - defines chromosome lengths
+         used to see if slopped BED region would go past chromosome end
+-b = extend region in both directions by specified number of bases (e.g. 50 each way)
+
+output is stdout, piped to an output BED file.
+
+slopped BED file used to get the FASTA sequence using bedtools getfasta
+
+bedtools getfasta -name -fi ../../reference_genome/hg19/hg19.fa -bed slop.<bedfile>.bed -fo fasta.<bedfile>.fa
+-name = uses the region name from the BED file as the FASTA identifier.
+        otherwise it just uses the chromosome and start and end coordinates.
+-fi = fasta reference file. Must be uncompressed.
+-bed = bed file of regions to get sequence for.
+-fo = fasta output file. If omitted, writes to stdout.
+
+REVERSE STRAND SEQUENCES NEED TO BE REVCOMPED
+WRITE A SCRIPT TO AUTOMATE THE WHOLE THING - FROM REFSEQ LIST TO FINAL FASTA
