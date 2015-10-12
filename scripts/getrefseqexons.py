@@ -17,7 +17,7 @@ outputs:
         start
         end (should be same as start)
         <gene>_int<intron_num>_[don/acc]
-        score (0 = donor, 1 = acceptor)
+        type (0 = donor, 1 = acceptor)
         strand [+/-]
 
 """
