@@ -32,12 +32,12 @@ Temporary folder for now, used while testing and fine-tuning the site extraction
 Fully detailed in the writeup... Which should probably have its own folder too!
 
 1. Download list of RefSeq genes/transcripts from UCSC table browser.
-..* group: "Genes and Gene Predictions"
-..* track: "RefSeq Genes"
-..* table: "refGene"
-..* region: "genome"
+ * group: "Genes and Gene Predictions"
+ * track: "RefSeq Genes"
+ * table: "refGene"
+ * region: "genome"
 2. The downloaded file contains a list of RefSeq transcripts, and the genes with which the are associated. The script make_exon_list.sh converst this list into a list of splice-sites extracted from the transcript with the most splice sites from each gene.
-..* getrefseqexons.py is run, which finds the longest (most exons) transcript, extracts the exon/intron boundary locations, and writes this information to stdout in BED format.
-..* bedtools slop is used to increase the size of the bed region to 50bp either side of the single base given by getrefseqexons.py. This is for flexibility, o the sie of selection can be easily changed. It also has built in controls to ensure a selection cannont exceed chromosome boundaries.
-..* bedtools getfasta uses the BED file to extract the genomic sequence from a given reference file (**NOTE:** *hg19 reference file is too big to include in the repo.*). FASTA identifier lines are automatically generated
-..* Since the FASTA is extracted from a single reference, any genes on the reverse strand will be incorrectly oriented. strandrevcomp.py reverse complements these sequences so that they are correct for the transcript orientation.
+ * getrefseqexons.py is run, which finds the longest (most exons) transcript, extracts the exon/intron boundary locations, and writes this information to stdout in BED format.
+ * bedtools slop is used to increase the size of the bed region to 50bp either side of the single base given by getrefseqexons.py. This is for flexibility, o the sie of selection can be easily changed. It also has built in controls to ensure a selection cannont exceed chromosome boundaries.
+ * bedtools getfasta uses the BED file to extract the genomic sequence from a given reference file (**NOTE:** *hg19 reference file is too big to include in the repo.*). FASTA identifier lines are automatically generated
+ * Since the FASTA is extracted from a single reference, any genes on the reverse strand will be incorrectly oriented. strandrevcomp.py reverse complements these sequences so that they are correct for the transcript orientation.
