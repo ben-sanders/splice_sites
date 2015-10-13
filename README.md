@@ -46,8 +46,8 @@ Fully detailed in the writeup... Which should probably have its own folder too!
 4. Run predictors
  * Before doing this, check that no new predictors have been published
  * Either:
- .* Use a custom script to run each tool, so that the output format is controllable, or:
- ..* Use alamut batch for the majority, and make a script to parse and interpret this output
+  * Use a custom script to run each tool, so that the output format is controllable, or:
+  * Use alamut batch for the majority, and make a script to parse and interpret this output
 5. Interpret results
  * Identifying significant changes:
   * Best practice guidelines suggest >10% change, presumable 10% reduction!
@@ -63,4 +63,5 @@ Fully detailed in the writeup... Which should probably have its own folder too!
     * e.g. >10% predicitve score reduction AND < -1 position score == Effect
     * score reduction but no position change == probably no effect
   * For literature variants, sequence is centered around variant, not splice site. This may cause some problems. Might be good to establish the position of the actual splice site, so we can look at its score + ranking.
+  * Is it ok to assume that the highest scoring position in the wildtype sequence is the splice site? Probably not, but how best to account for the position?
 
