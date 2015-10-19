@@ -1,0 +1,1 @@
+ID	Gene	NM_	HGVS	c. number	Affects +-1/2	chr.	strand	position	upstream	LENGTH CHECK	wildtype	mutant	downstream	LENGTH CHECK	Effect	Paper	Method	Comments
