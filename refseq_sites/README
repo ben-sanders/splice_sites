@@ -1,0 +1,9 @@
+BED files of all human splice sites.
+Extracted from UCSC table browser (
+ table ‘refGene’ from the track ‘RefSeq Genes’, and the group ‘Gen
+
+02_make_exon_list.sh generates a fasta file of sequences 100bp sequences around refseq splice sites, this format is not compatible with 
+alamut batch.
+
+Is there a way to force alamut to run without and alt allele? e.g. to jsut report on the REF sequence, without any score change etc.? 
+Probably not, although could perhaps run with the same allele duplicated?

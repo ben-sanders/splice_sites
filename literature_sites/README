@@ -1,0 +1,9 @@
+Raw folder contains the sources of the variants - papers and supporting files from papers.
+
+
+The data format is not quite right for Alamut batch, it was recorded in Excel and includes a lot of information that I thought would be necessary if 
+evaluating everything directly in the tools (e.g. if I had to submit each variant to a web server) 
+
+script convert_to_alamut_format.sh will rejig it into the write format for alamut.
+
+Alamut batch to be run through a script - run_alamut.sh
