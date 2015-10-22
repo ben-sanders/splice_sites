@@ -1,0 +1,3 @@
+As the database is quite large, the intermediate files to process files for upload have been deleted to save space.
+
+To recreate the database, follow  the instructions in the commented-out section at the end of the create_variantdb.sql

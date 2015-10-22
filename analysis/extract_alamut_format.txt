@@ -1,0 +1,60 @@
+-------------------
+General information
+-------------------
+
+In sqlite3, set the output separator to tab by:
+    sqlite> .separator "\t"
+    
+wite output file with:
+    
+    sqlite> .output <filename>
+    
+then select data.
+
+    SELECT <field names> FROM variants WHERE <conditions>
+
+
+Then exit sqlite with .exit (not sure if this is when the data is written?)
+
+------------------------
+Database schema reminder
+------------------------
+
+db_id   |   gene    |   var_id  |   chrom   |   pos_start   |   pos_end strand  |   transcript  |
+
+hgvs    |   ref_allele  |   alt_allele  |   up_50bp |   down_50bp   |   ref_seq |   alt_seq |
+
+canonical_site  |   effect  |   paper   |   method  |   comments    |   source  |
+
+
+-------------------------------------------
+VCF extraction for Alamut and MutPredSplice
+-------------------------------------------
+
+* Does MutPredSplice expect any addition INFO data for the variants?
+* Alamut documentation sounds a bit like vcf only works for +ve strand, while tab-delimited can account for strand.
+ * Maybe try both, and see if there's a difference in scores. If there is, go with tab-delimited.
+ 
+VCF format uses columns as follows:
+
+CHROM   POS ID  REF ALT QUAL    FILTER  INFO    FORMAT
+
+INFO, FILTER, and FORMAT columns contain key:value pairs that are defined in the ## header rows
+These columns, and QUAL, may be optional? could get away with leaving blank. Otherwise:
+Quality is the variant quality score, so for this should be set to a good value (e.g. 30).
+Filter should be PASS.
+
+CHROM= chrom
+POS = pos_start (what about ranges?)
+ * POS allows a single integer value only. Presuably ranged/multi-base events should give the first base and allow the rest to be inferred from REF + ALT data?
+REF = ref_allele
+ALT = alt_allele
+QUAL = 30
+FILTER = PASS
+
+------------------
+Format for SPIDEX?
+------------------
+
+Might just need the chromosome, position, and change - which could be got from the alamut format.
+Sort of depends on how it works, haven't downloaded it yet! Database? Flat file?

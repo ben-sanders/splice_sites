@@ -19,6 +19,7 @@ outputs:
         <gene>_int<intron_num>_[don/acc]
         type (0 = donor, 1 = acceptor)
         strand [+/-]
+	    transcript (NM_)
 
 """
 
@@ -189,19 +190,23 @@ class Transcript(object):
         # write to stdout, so can redirect if wanted.
         for i in range(len(self.donors)):
             # print donor as a single base
-            print "%s\t%s\t%s\t%s_int%d_don_%s\t0" % (self.chrom, 
+            print "%s\t%s\t%s\t%s_int%d_don\t0\t%s\t%s\t%s" % (self.chrom, 
                                                          self.donors[i],
                                                          self.donors[i],
                                                          self.name2,
                                                          i+1,
-                                                         self.strand)
+                                                         self.strand,
+                                                         self.name,
+                                                         self.name2)
             # now acceptor - set score to 1
-            print "%s\t%s\t%s\t%s_int%d_acc_%s\t1" % (self.chrom, 
+            print "%s\t%s\t%s\t%s_int%d_acc\t1\t%s\t%s\t%s" % (self.chrom, 
                                                          self.acceptors[i],
                                                          self.acceptors[i],
                                                          self.name2,
                                                          i+1,
-                                                         self.strand)
+                                                         self.strand,
+                                                         self.name,
+                                                         self.name2)
             
     def __str__(self):
         return "%s\t%s\t%s\t%s" % (self.chrom, self.name2, self.name, self.exonEnds)
@@ -277,4 +282,5 @@ def run(fname):
     genelist.getsplicesites()
 
 if __name__ == "__main__":
-    run("refgenes.txt")
+    import sys
+    run(sys.argv[1])
