@@ -28,7 +28,7 @@ def read(fname):
             print line.rstrip()
     
     # summary should be pritned to stderr, so stdout can be redirected to file without it.
-    name = "-------------------\n" + str(fname) + "\n-------------------\n"
+    name = str(fname) + "\n-------------------\n"
     sys.stderr.write(name)
     tl = "total lines: " + str(linecount) + "\n"
     sys.stderr.write(tl)
