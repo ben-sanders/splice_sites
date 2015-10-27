@@ -58,7 +58,7 @@ python ../scripts/strandrevcomp.py negative.ss.acceptors.fa > revcomp.negative.s
 grep -v "^>" positive.ss.donors.fa > combined.donors.intermediate
 grep -v "^>" revcomp.negative.ss.donors.fa >> combined.donors.intermediate
 grep -v "^>" positive.ss.acceptors.fa > combined.acceptors.intermediate
-grep -v "^>" revcomp.negative.ss.donors.fa >> combined.acceptors.intermediate
+grep -v "^>" revcomp.negative.ss.acceptors.fa >> combined.acceptors.intermediate
 
 # there are a few lowercase sequences
 tr '[:lower:]' '[:upper:]' < combined.donors.intermediate > combined.donors

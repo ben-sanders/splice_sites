@@ -132,5 +132,8 @@ if __name__ == "__main__":
     rawpwm = makepwm(fname)
     
     pcpwm = percentpwm(rawpwm)
-    printpwm(pcpwm)
+    if sys.argv[2] == "--logo":
+        printforlogo(pcpwm)
+    else:
+        printpwm(pcpwm)
     
