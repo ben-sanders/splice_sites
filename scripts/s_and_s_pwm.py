@@ -80,11 +80,11 @@ def printforlogo(pcpwm):
     for col in pcpwm:
         logocol = []
         for i in range(100):
-            if i <= col[0]:
+            if i < col[0]:
                 logocol.append("A")
-            elif i <= col[0]+col[1]:
+            elif i < col[0]+col[1]:
                 logocol.append("C")
-            elif i <= col[0]+col[1]+col[2]:
+            elif i < col[0]+col[1]+col[2]:
                 logocol.append("G")
             else:
                 logocol.append("T")

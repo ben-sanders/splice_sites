@@ -64,10 +64,26 @@ grep -v "^>" revcomp.negative.ss.acceptors.fa >> combined.acceptors.intermediate
 tr '[:lower:]' '[:upper:]' < combined.donors.intermediate > combined.donors
 tr '[:lower:]' '[:upper:]' < combined.acceptors.intermediate > combined.acceptors
 
+egrep "^[ACGT]{3}GT" combined.donors > canonical.donors
+egrep -v "^[ACGT]{3}GT" combined.donors > nonstandard.donors
+egrep "^[ACGT]{12}AG" combined.acceptors > canonical.acceptors
+egrep -v "^[ACGT]{12}AG" combined.acceptors > nonstandard.acceptors
+
 # clean up BED files and unprocess FASTA
 rm *.bed *.fa *.intermediate
 
-python ../scripts/s_and_s_pwm.py combined.donors
-python ../scripts/s_and_s_pwm.py combined.acceptors
+# generate the probability matrices, don't worry about background frequencies and 'true' pwms
+python ../scripts/s_and_s_pwm.py combined.donors > ppm.combined.donors
+python ../scripts/s_and_s_pwm.py combined.acceptors > ppm.combined.acceptors
+python ../scripts/s_and_s_pwm.py canonical.donors > ppm.canonical.donors
+python ../scripts/s_and_s_pwm.py canonical.acceptors > ppm.canonical.acceptors
+python ../scripts/s_and_s_pwm.py nonstandard.donors > ppm.nonstandard.donors
+python ../scripts/s_and_s_pwm.py nonstandard.acceptors > ppm.nonstandard.acceptors
 
-
+# generate files for WebLogo
+python ../scripts/s_and_s_pwm.py combined.donors --logo > logo.combined.donors
+python ../scripts/s_and_s_pwm.py combined.acceptors --logo > logo.combined.acceptors
+python ../scripts/s_and_s_pwm.py canonical.donors --logo > logo.canonical.donors
+python ../scripts/s_and_s_pwm.py canonical.acceptors --logo > logo.canonical.acceptors
+python ../scripts/s_and_s_pwm.py nonstandard.donors --logo > logo.nonstandard.donors
+python ../scripts/s_and_s_pwm.py nonstandard.acceptors --logo > logo.nonstandard.acceptors
