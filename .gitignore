@@ -1,3 +1,9 @@
+# the database file is too large for github, but can easily be recreated
 *.db
+
+# fasta reference genome is ~3GB, don't want to endlessly back that up!
 hg19/*.fa
 *.fa.fai
+
+# various intermediate files are created by scripts
+*.allexons*
