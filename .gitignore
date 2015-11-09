@@ -1,1 +1,3 @@
 *.db
+hg19/*.fa
+*.fa.fai
