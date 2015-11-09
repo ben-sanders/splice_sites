@@ -58,3 +58,5 @@ cat upper.wt.allexons | awk '{if ($1 == "C" || $1 == "T") print "A"; else print 
 # Combine into one output:
 paste plusminus1.allexons.bed upper.minus50.allexons upper.wt.allexons alt.allexons upper.plus50.allexons > combined.allexons
 
+# remove intermediary files
+rm *.bed *.fa *wt.allexons *50.allexons alt.allexons
