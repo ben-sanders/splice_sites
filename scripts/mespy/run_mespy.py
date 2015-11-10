@@ -57,27 +57,57 @@ def find_site(test_site, score_list):
     # if not found, return -1
     return -1
 
-def generate_scores(seq1, seq2):
+def generate_scores(seq1, seq2, mode):
     """
     Runs mespy window across each sequence, and returns lists ranked by score (from highest to lowest)
+    window output is (TYPE, POS_IN_SEQ, SEQ_AS_EVALUATED, SCORE)
     """    
-    scores = mespy.window(test)
+    scores = mespy.window(seq1, mode)
     scores = sorted(scores, key=itemgetter(3), reverse=True)
 
-    scores2 = mespy.window(test2)
+    scores2 = mespy.window(seq2, mode)
     scores2 = sorted(scores2, key=itemgetter(3), reverse=True)
     
     return scores, scores2
 
-def mespy_test():
+def run_mespy(seq1, seq2, mode="both"):
     """
     Just a wrapper for testing purposes.
     """
-    test = "CCGCATTTGTACTGTGTTAAGCAATAAAAAGTATACCTTTTTGTTGTCAGGCTTGAGAAAGAGATCCAAGATCTTGAAAAAGCTGAACTGCAAATCTCAA"
-    test2 = "ACTACGAGCATCGACGGCGACGACTATCTACTACTACTAGCAGCTACATTATATAGCAGCACTATCAGCTCTAGCTGCGATGCTAGCTACGATCGTATAT"
-
-    wt_scores, var_scores = generate_scores(test, test2)
+    wt_scores, var_scores = generate_scores(seq1, seq2, mode)
     rank_change, score_change = score_site(wt_scores[0], wt_scores, var_scores)
-
+    position = wt_scores[0][1]
+    return position, rank_change, score_change
+    
+def read_input(fname):
+    """
+    Run mespy on variants in file from variant database
+    Doesn't support vcf, as it needs to include the full sequence.
+    Input is in this format:
+    
+    VAR_DB_ID   SITE_ID REF_SEQ ALT_SEQ TYPE
+    """
+    f = open(fname, "r")
+    for line in f:
+        line = line.strip().split()
+        ref = line[2]
+        alt = line[3]
+        if line[4] == "acc":
+            # look at 3' acceptor motif only
+            mode = 3
+        elif line[4] == "don":
+            # look at 5' donor motif only
+            mode = 5
+        else:
+            # site type not specified, so examine both
+            mode = "both"
+            
+        position, rank_change, score_change = run_mespy(ref, alt, mode)
+        print "%s\t%s\t%d\t%d\t%.2f" % (line[0], line[1], position, rank_change, score_change)    
+    
 if __name__ == "__main__":
-    mespy_test()
+    #test1 = "CCCGCGGACCCTCCCTCCCGGCCTTCCGCCACCGGCGCGGGCGCAACTCACCGGGCATCAGCTCTTCCGGCTCCCTCATGCCACGGGCAGTACGGGCAGCC"
+    #test2 = "CCCGCGGACCCTCCCTCCCGGCCTTCCGCCACCGGCGCGGGCGGGGCTCAACGGGCATCAGCTCTTCCGGCTCCCTCATGCCACGGGCAGTACGGGCAGCC"
+    #mode = 3
+    read_input("mespytest.txt")
+    #run_mespy(test1, test2, mode)
