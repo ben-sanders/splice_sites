@@ -7,3 +7,6 @@ hg19/*.fa
 
 # various intermediate files are created by scripts
 *.allexons*
+
+# until it's fully automated, the random_sites folder contains some massive files
+random_sites/
