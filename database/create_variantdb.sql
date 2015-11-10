@@ -25,7 +25,8 @@ CREATE TABLE variants (db_id INTEGER PRIMARY KEY,
                        paper TEXT,
                        method TEXT,
                        comments TEXT,
-                       source TEXT);
+                       source TEXT,
+                       type TEXT);
 COMMIT;
 
 /* 

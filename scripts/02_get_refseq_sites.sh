@@ -1,10 +1,21 @@
+#!/bin/bash
+#################################
+# 02_get_refseq_sites.sh
+# ------------------
+# author: Ben Sanders
+# ben.sanders@salisbury.nhs.uk
+# ------------------
+# 2015-11-10
+# ------------------
+# from a given RefSeq gene list (refseq_sites/gene_list/refgenes.txt - this may
+# get replaced with a download link, to ensure it's always up to date), extracts
+# splice sites BED file 
+# The gene list location if defined in the python script, so that would need to 
+# be edited if the script was also going to download it. Probably good practice 
+# anyway, to avoid hardcoding too much.
+#################################
 
-# from a given RefSeq gene list (refseq_sites/gene_list/refgenes.txt), extract splice sites BED file
-# the gene list location if defined in the python script, but it probably
-# doesn't need to be
-
-
-python ~/Documents/Ben_project/splice_sites/scripts/getrefseqexons.py "$1" > refseq_splicesites.bed
+python ../scripts/getrefseqexons.py "$1" > refseq_splicesites.bed
 
 # replace X,Y, and M with numbers so the sort correctly. 
 # M should come first in hg19, so set to 0 
@@ -31,12 +42,12 @@ cat plusminus1.allexons.bed | awk 'BEGIN{FS="\\t"}{print $1 "\t" $2-1 "\t" $3 "\
 
 #NOTE: the minus50 bed file, when converted to FASTA, misses the base between the end of the range and the splice-site base. The end position of the minus50 needs 1 adding
 
-bedtools flank -i plusminus1.allexons.bed -g /home/genetics/Documents/ReferenceGenome/hg19.fa.fai -l 50 -r 0 > minus50.allexons.bed
-bedtools flank -i plusminus1.allexons.bed -g /home/genetics/Documents/ReferenceGenome/hg19.fa.fai -l 0 -r 49 | awk 'BEGIN{FS="\\t"}{print $1 "\t" $2-1 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8}'> plus50.allexons.bed
+bedtools flank -i plusminus1.allexons.bed -g ../hg19/hg19.genome -l 50 -r 0 > minus50.allexons.bed
+bedtools flank -i plusminus1.allexons.bed -g ../hg19/hg19.genome -l 0 -r 49 | awk 'BEGIN{FS="\\t"}{print $1 "\t" $2-1 "\t" $3 "\t" $4 "\t" $5 "\t" $6 "\t" $7 "\t" $8}'> plus50.allexons.bed
 
-bedtools getfasta -fi /home/genetics/Documents/ReferenceGenome/hg19.fa -name -bed wt.allexons.bed -fo wt.allexons.fa
-bedtools getfasta -fi /home/genetics/Documents/ReferenceGenome/hg19.fa -name -bed minus50.allexons.bed -fo minus50.allexons.fa
-bedtools getfasta -fi /home/genetics/Documents/ReferenceGenome/hg19.fa -name -bed plus50.allexons.bed -fo plus50.allexons.fa
+bedtools getfasta -fi ../hg19/hg19.fa -name -bed wt.allexons.bed -fo wt.allexons.fa
+bedtools getfasta -fi ../hg19/hg19.fa -name -bed minus50.allexons.bed -fo minus50.allexons.fa
+bedtools getfasta -fi ../hg19/hg19.fa -name -bed plus50.allexons.bed -fo plus50.allexons.fa
 
 # remove the id lines from fasta outputs with grep
 	
