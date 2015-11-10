@@ -10,5 +10,9 @@ hg19/*.fa
 
 # until it's fully automated, the random_sites folder contains some massive files
 random_sites/
+
 # hg19 fodler contains links, not files, but just to be safe
 hg19/
+
+# Try to ignore temp files from gedit
+*.*~
