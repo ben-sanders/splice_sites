@@ -11,6 +11,7 @@ Score site position by change in ranking, e.g. drop one place = -1, stay the sam
 
 import mespy
 from operator import itemgetter
+import sys
 
 def score_site(wt_site, wt_scores, var_scores):
     """ 
@@ -33,9 +34,10 @@ def score_site(wt_site, wt_scores, var_scores):
     wt_score = wt_site[3]
     var_score = var_scores[var_rank][3]
     # take wt from var, so increase == positive, decrease == negative
-    score_change = var_score / wt_score * 100
+    score_diff = var_score - wt_score
+    score_change = (score_diff / abs(wt_score)) * 100
     rank_change = wt_rank - var_rank
-    return rank_change, score_change
+    return rank_change, score_change, wt_score, var_score
 
 def find_site(test_site, score_list):
     """
@@ -75,18 +77,29 @@ def run_mespy(seq1, seq2, mode="both"):
     Just a wrapper for testing purposes.
     """
     wt_scores, var_scores = generate_scores(seq1, seq2, mode)
-    rank_change, score_change = score_site(wt_scores[0], wt_scores, var_scores)
-    position = wt_scores[0][1]
-    return position, rank_change, score_change
-    
+    numwt = len(wt_scores)
+    numvar = len(var_scores)
+    if numwt != 0:
+        rank_change, score_change, wt_score, var_score = score_site(wt_scores[0], wt_scores, var_scores)
+        position = wt_scores[0][1]
+        wt_score = wt_scores[0][3]
+        return position, rank_change, score_change, wt_score, var_score
+    else:
+        return -1, -999, -999
+        
 def read_input(fname):
     """
     Run mespy on variants in file from variant database
     Doesn't support vcf, as it needs to include the full sequence.
     Input is in this format:
     
-    VAR_DB_ID   SITE_ID REF_SEQ ALT_SEQ TYPE
+    DB_ID   SITE_ID REF_SEQ ALT_SEQ TYPE
+    
+    output (to stdout) is:
+    
+    DB_ID   SITE_ID POS RANK_CHANGE  SCORE_CHANGE(%)
     """
+    print "DB_ID\tSITE_ID\tPOS\tRANK_CHANGE\tWT\tVAR\tSCORE_CHANGE"
     f = open(fname, "r")
     for line in f:
         line = line.strip().split()
@@ -101,13 +114,18 @@ def read_input(fname):
         else:
             # site type not specified, so examine both
             mode = "both"
-            
-        position, rank_change, score_change = run_mespy(ref, alt, mode)
-        print "%s\t%s\t%d\t%d\t%.2f" % (line[0], line[1], position, rank_change, score_change)    
+        
+        if "N" in line[2] or "N" in line[3]:
+            # N characters cause the scoring to crash
+            print "%s\t%s\tN\tN\tN\tN\tN"
+        else:        
+            position, rank_change, score_change, wt_score, var_score = run_mespy(ref, alt, mode)
+            print "%s\t%s\t%d\t%d\t%.2f\t%.2f\t%.2f" % (line[0], line[1], position, rank_change, wt_score, var_score, score_change)    
     
 if __name__ == "__main__":
     #test1 = "CCCGCGGACCCTCCCTCCCGGCCTTCCGCCACCGGCGCGGGCGCAACTCACCGGGCATCAGCTCTTCCGGCTCCCTCATGCCACGGGCAGTACGGGCAGCC"
     #test2 = "CCCGCGGACCCTCCCTCCCGGCCTTCCGCCACCGGCGCGGGCGGGGCTCAACGGGCATCAGCTCTTCCGGCTCCCTCATGCCACGGGCAGTACGGGCAGCC"
     #mode = 3
-    read_input("mespytest.txt")
+    print sys.path[0]
+    read_input(sys.argv[1])
     #run_mespy(test1, test2, mode)

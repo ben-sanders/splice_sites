@@ -90,13 +90,14 @@ sort -k2,2 -k3n,3 \
 # import + use in Python. Can account for change in score of multiple positions,
 # including ranking + changes in the ranking. 
 
-# MESpy assumes the highest scoring site is the wild-type, might want to change
-# this to go by position - input from database has 50bp-variant_site-50bp, so
-# should be around position 50? NO - variant (in literature sources) is NOT 
-# always at the splice site!
+# Since this script is for refseq/random sites only, and we know where in the
+# input sequence they are, restricting the input sequence to around that site 
+# may help target the analysis more specifically.
 
-sqlite3 variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type FROM variants WHERE source="REFSEQ";' | sed s/"|"/"\t"/g > refseq_sites.mespy
+sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type FROM variants WHERE source="REFSEQ";' | sed s/"|"/"\t"/g | awk 'BEGIN{FS="\\t"}{print $1"\t"$2"\t"substr($3, 35, 30)"\t"substr($4, 35, 30)"\t"$5}'> refseq_sites.mespy
 
+# this might have to be run from within the mespy folder?
+python ../scripts/mespy/run_mespy.py refseq_sites.mespy
 
 # mespy returns results as
-# DB_ID VAR_ID  HIGHEST_SCORING_POSITION    RANK_CHANGE SCORE_CHANGE
+# DB_ID VAR_ID  HIGHEST_SCORING_POSITION    RANK_CHANGE SCORE_CHANGE(%)

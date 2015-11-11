@@ -23,6 +23,7 @@ from math import log
 from operator import itemgetter
 from string import maketrans
 import argparse
+import sys
 
 def log2(value):
     """actually seems to return the log(value)/log(2), rather than log2(value)"""
@@ -136,7 +137,7 @@ def makemaxentscores():
     not sure what these models do or how, but each model is a dict
     of index : sequence.
     """
-    modeldir = "splicemodels/";
+    modeldir = sys.path[0]+"/splicemodels/";
     modellist = ['me2x3acc1', 'me2x3acc2', 'me2x3acc3',
                  'me2x3acc4', 'me2x3acc5', 'me2x3acc6',
                  'me2x3acc7', 'me2x3acc8', 'me2x3acc9']
@@ -262,8 +263,8 @@ def window(sequence, mode="both"):
     """
     
     # create the score matrices here, or they'll be recreated with each score call
-    me2x5 = makescorematrix('splicemodels/me2x5')
-    seq = makesequencematrix('splicemodels/splice5sequences')
+    me2x5 = makescorematrix(sys.path[0]+'/splicemodels/me2x5')
+    seq = makesequencematrix(sys.path[0]+'/splicemodels/splice5sequences')
     threetables = makemaxentscores()
     
     scores = []

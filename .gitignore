@@ -16,3 +16,6 @@ hg19/
 
 # Try to ignore temp files from gedit
 *.*~
+
+# input files for mespy can be quite large
+*.mespy
