@@ -25,8 +25,8 @@
 
 if [ ! -e hg19/hg19.fa ]
 then
-    echo "No reference genome found"
-    echo "Should now run 01_make_hg19_fasta.sh. But doesn't at the moment"
+    echo "DEBUG: running ../scripts/01_make_hg19_fasta.sh"
+    #./../scripts/01_make_hg19_fasta.sh
 fi
 
 ############## 02_get_refseq_sites.sh ##############
@@ -69,7 +69,7 @@ cd random_sites/
 if [ ! -e combined.nonsplicesites ]
 then
     echo "DEBUG: running ../scripts/03_generate_random_sites.sh"
-    #./../scripts/03_generate_random_sites.sh
+    #./../scripts/03_generate_random_sites.sh 2> /dev/null
 fi
 
 # go back to root folder
@@ -91,7 +91,7 @@ cd database/
 #       set it up as needed.
 
 echo "DEBUG: running ../scripts/04_generate_sql.sh"
-# ./../scripts/04_generate_sql.sh
+#./../scripts/04_generate_sql.sh 2> /dev/null
 
 # go back to root folder
 cd ..
@@ -100,11 +100,12 @@ cd ..
 
 #TODO
 
-# move to ther refseq fold. This script runs on both refseq and random sites,
+# move to ther refseq folder. This script runs on both refseq and random sites,
 # but handles the changing itself.
 cd refseq_sites
 
-echo "ERROR: This doesn't do anything yet."
+echo "DEBUG: running ../scripts/05_run_refseq_analysis"
+#./../scripts/05_run_refseq_analysis 2> /dev/null
 
 # go back to root folder
 cd ..

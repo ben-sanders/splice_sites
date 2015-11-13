@@ -13,7 +13,7 @@
 
 # file variables
 REFSEQFILE="../refseq_sites/combined.allexons"
-RANDFILE="../random_sites/combined.nonsplicesites   "
+RANDFILE="../random_sites/combined.nonsplicesites"
 LITFILE="../literature_sites/literature_variants_with_header.txt"
 
 # check the files exist, quit if one doesn't

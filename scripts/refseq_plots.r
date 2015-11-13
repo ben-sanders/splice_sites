@@ -32,30 +32,30 @@ merged_data$src <- as.factor(merged_data$src)
 
 ## full histogram ##
 
-png("plots/refseq_full.png")
+pdf("plots/refseq_full.pdf")
 ggplot(refseq_cleaned_data, aes(WT)) + geom_histogram(fill="blue", alpha=0.7, binwidth=1) + ylab("Count") + xlab("MES Score") + ggtitle("Distribution of MES scores for RefSeq splice sites (3' and 5' combined)")
 dev.off()
 
-png("plots/random_full.png")
+pdf("plots/random_full.pdf")
 ggplot(random_cleaned_data, aes(WT)) + geom_histogram(fill="red", alpha=0.7, binwidth=1) + ylab("Count") + xlab("MES Score") + ggtitle("Distribution of MES scores for randomly selected non-splice AG/GT dinucleotides")
 dev.off()
 
 # show both random and refseq on the same plot
-png("plots/combined_full.png")
+pdf("plots/combined_full.pdf")
 ggplot(merged_data, aes(WT)) + geom_histogram(aes(fill=src), alpha=0.5, binwidth=1, position="identity") + ylab("Count") + xlab("MES Score") + ggtitle("Distribution of MES scores for RefSeq and random sites")
 dev.off()
 
 ## below zero ##
 
 # want to see the area below zero in more detail
-png("plots/refseq_negative.png")
+pdf("plots/refseq_negative.pdf")
 ggplot(subset(refseq_cleaned_data, WT < 0), aes(WT)) + geom_histogram(fill="blue", alpha=0.7, binwidth=1) + ylab("Count") + xlab("MES Score") + ggtitle("Distribution of scores below 0 for RefSeq splice sites")
 dev.off()
 
 ## above zero ##
 
 # and might as well do above zero as well
-png("plots/refseq_positive.png")
+pdf("plots/refseq_positive.pdf")
 ggplot(subset(refseq_cleaned_data, WT > 0), aes(WT)) + geom_histogram(fill="blue", alpha=0.7, binwidth=1) + ylab("Count") + xlab("MES Score") + ggtitle("Distribution of scores above 0 for RefSeq splice sites")
 dev.off()
 
@@ -97,4 +97,6 @@ for(cutoff in seq(floor(min(merged_data$WT)), ceiling(max(merged_data$WT))))
 }
 results <- data.frame(results)
 
+pdf("plots/MESpy_ROC.pdf")
 ggplot(results) + geom_line(aes(x=X1, y=X2), size=1) + xlab("False positive rate") + ylab("True positive rate") + ggtitle("MaxEntScan reciever operating characterstic curve")
+dev.off()
