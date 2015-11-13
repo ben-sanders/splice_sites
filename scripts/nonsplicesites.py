@@ -10,6 +10,7 @@ def run(fname, target):
     lastbase = None
     currentbase = None
     currentpos = 0
+    counter = 1
     
     for line in f:
         # remove trailing newlines
@@ -36,11 +37,18 @@ def run(fname, target):
                     currentbase = line[i]
                     window = lastbase + currentbase
                     if window == target:
-                        # output in bed format, start and end +- 1 gives the
-                        # full dinucleotide in getfasta
-                        print "%s\t%d\t%d" % (currentchrom, 
-                                                  currentpos-1, 
-                                                  currentpos+1)
+                        # output in bed format, 
+                        if target == "AG":
+                            print "%s\t%d\t%d\tRAND_%06d_acc\t1\t+" % (currentchrom, 
+                                                                       currentpos+1, 
+                                                                       currentpos+1,
+                                                                       counter)
+                        else:
+                            print "%s\t%d\t%d\tRAND_%06d_don\t0\t+" % (currentchrom, 
+                                                                       currentpos-1, 
+                                                                       currentpos-1,
+                                                                       counter)
+                        counter += 1
                 # increment the position (do at end to retain 0-indexing)
                 # doing at beginning would mean starting at 1, which is not
                 # right for bedtools.

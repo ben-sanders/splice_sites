@@ -15,7 +15,16 @@
 # anyway, to avoid hardcoding too much.
 #################################
 
-python ../scripts/getrefseqexons.py "$1" > refseq_splicesites.bed
+REFSEQFILE="gene_list/refgenes.txt"
+
+python ../scripts/getrefseqexons.py "$REFSEQFILE" > raw.refseq_splicesites.bed
+
+# Remove all non-NM_ transcripts
+# this removes all miRNAs, better than removing by "MIR" in name, as there are
+# a couple of transcripts left described as "miRNA host genes" that show with
+# exons on NCBI + Ensembl  
+grep "\bNM_" raw.refseq_splicesites.bed > refseq_splicesites.bed
+ 
 
 # replace X,Y, and M with numbers so the sort correctly. 
 # M should come first in hg19, so set to 0 

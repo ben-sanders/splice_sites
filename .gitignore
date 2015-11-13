@@ -7,6 +7,7 @@ hg19/*.fa
 
 # various intermediate files are created by scripts
 *.allexons*
+*.nosplicesites*
 
 # until it's fully automated, the random_sites folder contains some massive files
 random_sites/
@@ -19,3 +20,4 @@ hg19/
 
 # input files for mespy can be quite large
 *.mespy
+*.mespy.input
