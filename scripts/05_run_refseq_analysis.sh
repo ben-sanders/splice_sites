@@ -125,9 +125,10 @@ sed s/"|"/"\t"/g | \
 awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 48, 23)"\t"substr($4, 48, 23)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 32, 23)"\t"substr($4, 32, 23)"\t"$5"\t"$6 }}' \
 > refseq_sites.mespy.input
 
-# this might have to be run from within the mespy folder?
+# run MESpy
 python ../scripts/mespy/run_mespy.py refseq_sites.mespy.input > out.refseq_sites.mespy
 
+# cleanup input files
 #rm refseq_sites.mespy.input
 
 cd ../random_sites
@@ -137,8 +138,10 @@ sed s/"|"/"\t"/g | \
 awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 48, 23)"\t"substr($4, 48, 23)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 32, 23)"\t"substr($4, 32, 23)"\t"$5"\t"$6 }}' \
 > random_sites.mespy.input
 
+# run MESpy
 python ../scripts/mespy/run_mespy.py random_sites.mespy.input > out.random_sites.mespy
 
+# cleanup input files
 #rm random_sites.mespy.input
 
 # mespy returns results as
@@ -155,4 +158,19 @@ python ../scripts/mespy/run_mespy.py random_sites.mespy.input > out.random_sites
 # that might be best, as the other tools will give different scores (e.g. 0-100,
 # 0.0 - 1.0, etc)
 
+# 5. GeneSplicer
+# --------------
+
+# GeneSplicer takes fast inputs, but doesn't seem to account for multiple
+# samples - it concatenates them all together!?
+# need to feed it individual files, which obviously would be a pain so will
+# extract database as one file and then pull out the individual sequences for 
+# GeneSplicer
+
+# will run this in a separate script, just use this for the initial database
+# extraction.
+
 ################ R script and plotting ########################
+cd ../refseq_sites
+
+R < ../scripts/refseq_plots.r --no-save

@@ -21,3 +21,13 @@ hg19/
 # input files for mespy can be quite large
 *.mespy
 *.mespy.input
+
+# and others:
+*.refseq
+*.alamut
+
+# sql upload files are pretty big, and can generate themselves
+*upload.sql
+
+# same for any generated vcfs
+*.vcf

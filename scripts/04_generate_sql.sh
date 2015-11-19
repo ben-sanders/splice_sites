@@ -69,7 +69,7 @@ rm variantdb.db
 
 # recreate using files created above
 touch variantdb.db
-sqlite3 variantdb.db '.read create_variant_db.sql'
+sqlite3 variantdb.db '.read create_variantdb.sql'
 sqlite3 variantdb.db '.read literature_variant_upload.sql'
 sqlite3 variantdb.db '.read refseq_variant_upload.sql'
 sqlite3 variantdb.db '.read random_site_upload.sql'

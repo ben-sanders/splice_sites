@@ -26,7 +26,7 @@
 if [ ! -e hg19/hg19.fa ]
 then
     echo "DEBUG: running ../scripts/01_make_hg19_fasta.sh"
-    #./../scripts/01_make_hg19_fasta.sh
+    ./../scripts/01_make_hg19_fasta.sh
 fi
 
 ############## 02_get_refseq_sites.sh ##############
@@ -44,7 +44,7 @@ cd refseq_sites/
 
 # run script
 echo "DEBUG: running ../scripts/02_get_refseq_sites.sh"
-#./../scripts/02_get_refseq_sites.sh
+./../scripts/02_get_refseq_sites.sh
 
 # go back to root folder
 cd ..
@@ -69,7 +69,7 @@ cd random_sites/
 if [ ! -e combined.nonsplicesites ]
 then
     echo "DEBUG: running ../scripts/03_generate_random_sites.sh"
-    #./../scripts/03_generate_random_sites.sh 2> /dev/null
+    ./../scripts/03_generate_random_sites.sh
 fi
 
 # go back to root folder
@@ -91,7 +91,7 @@ cd database/
 #       set it up as needed.
 
 echo "DEBUG: running ../scripts/04_generate_sql.sh"
-#./../scripts/04_generate_sql.sh 2> /dev/null
+./../scripts/04_generate_sql.sh
 
 # go back to root folder
 cd ..
@@ -105,7 +105,7 @@ cd ..
 cd refseq_sites
 
 echo "DEBUG: running ../scripts/05_run_refseq_analysis"
-#./../scripts/05_run_refseq_analysis 2> /dev/null
+./../scripts/05_run_refseq_analysis.sh
 
 # go back to root folder
 cd ..
