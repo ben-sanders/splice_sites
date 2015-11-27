@@ -1,4 +1,38 @@
-As the database is quite large, the intermediate files to process files for upload have been deleted to save space.
+VARIANT DB FORMAT
+-----------------
 
-to set the output to tab delimited, use the command
-    sqlite3> .mode tabs
+CREATE TABLE variants (db_id INTEGER PRIMARY KEY,
+		       gene TEXT,
+                       var_id TEXT NOT NULL,
+                       chrom TEXT NOT NULL,
+                       pos_start INTEGER NOT NULL,
+                       pos_end INTEGER NOT NULL,
+                       strand TEXT CHECK(strand IN ('+', '-')),
+                       transcript TEXT,
+                       hgvs TEXT,
+                       ref_allele TEXT,
+                       alt_allele TEXT,
+                       up_50bp TEXT,
+                       down_50bp TEXT,
+                       ref_seq TEXT,
+                       alt_seq TEXT,
+                       canonical_site TEXT,
+                       effect TEXT,
+                       paper TEXT,
+                       method TEXT,
+                       comments TEXT,
+                       source TEXT,
+                       type TEXT);
+
+FILES
+-----
+
+create_variantdb.sql - recreates empty database
+literature_variant_upload.sql - TEMP/IGNORED
+random_site_upload.sql - TEMP/IGNORED
+README - this file
+refseq_variant_upload.sql - TEMP/IGNORED
+variatdb.db - the database file
+
+Upload files are created automatically by thier respective scripts. They do not need to be retained when the
+database has been updated, and are ignored by the git repository due to their large size.

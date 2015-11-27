@@ -22,12 +22,13 @@ SITENUM=`wc -l "$EXONFILE" | awk '{print $1}'`
 PERTYPE=$(( $SITENUM / 2 ))
 GENOMEFILE="../hg19/hg19.genome"
 GENOMEFASTA="../hg19/hg19.fa"
+SPLICEDISTANCE=20 # minimum distance that should be left around splice sites
 #NOTE: This takes a long time to run, as it has to iterate over the entire
 #      human genome several times
 
 # bedtools complement reverses the selection - returns the regions of the
 # genome file that aren't covered by intervals in the combined.allexons bedfile.
-cat "$EXONFILE" | bedtools slop -i stdin -g "$GENOMEFILE" -b 20 | \
+cat "$EXONFILE" | bedtools slop -i stdin -g "$GENOMEFILE" -b "$SPLICEDISTANCE" | \
 bedtools complement -i stdin -g "$GENOMEFILE" > inverse.allexons
 
 # Generate bed file of all AG/GT sites in the genome, get rid of
@@ -40,10 +41,10 @@ bedtools complement -i stdin -g "$GENOMEFILE" > inverse.allexons
 # this is slow, so check if either file already exists first.
 if [ ! -e combined.nonsplicesites ]
 then
-    python ../scripts/nonsplicesites.py "$GENOMEFASTA" AG | \
+    python ../scripts/python/nonsplicesites.py "$GENOMEFASTA" AG | \
     bedtools intersect -a stdin -b inverse.allexons | sort -R | \
     head -"$PERTYPE" > nonsplicesites.bed
-    python ../scripts/nonsplicesites.py "$GENOMEFASTA" GT | \
+    python ../scripts/python/nonsplicesites.py "$GENOMEFASTA" GT | \
     bedtools intersect -a stdin -b inverse.allexons | sort -R | \
     head -"$PERTYPE" >> nonsplicesites.bed
 fi

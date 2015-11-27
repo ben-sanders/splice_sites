@@ -17,7 +17,7 @@
 
 REFSEQFILE="gene_list/refgenes.txt"
 
-python ../scripts/getrefseqexons.py "$REFSEQFILE" > raw.refseq_splicesites.bed
+python ../scripts/python/getrefseqexons.py "$REFSEQFILE" > raw.refseq_splicesites.bed
 
 # Remove all non-NM_ transcripts
 # this removes all miRNAs, better than removing by "MIR" in name, as there are

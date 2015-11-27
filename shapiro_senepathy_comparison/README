@@ -5,7 +5,7 @@ This analysis uses 201989 of each type of site, from human RefSeq transcripts, t
 Runs as an automated pipeline - just run:
 	$ ./<path_to_script>/s_and_s_calculation.sh <refseq_file>
 
-NOTE: Due to calls within the script, it should only be run from a folder one level down from scripts/ (i.e. there are ../scripts/<script> paths hard coded in, and it's not really worth changing)
+NOTE: Due to calls within the script, it should only be run from within the shapiro_senepathy_comparison
 
 The script will generate probability matrices and representative 100 sequence FASTA files that can be used with online sequence logo generators
 
