@@ -76,26 +76,26 @@ ggplot(refseq, aes(x=factor(1), fill=CALL)) + geom_bar(width=1) + coord_polar(th
 ggplot(random, aes(x=factor(1), fill=CALL)) + geom_bar(width=1) + coord_polar(theta="y") + blank_theme + ggtitle("Proportion of random sites called by GeneSplicer")
 
 # merged histogram (of called sites)
-ggplot(merged_GS_data, aes(SCORE)) + geom_histogram(aes(fill=src), alpha=0.5, binwidth=1, position="identity") + ylab("Count") + xlab("Score") + ggtitle("Distribution of GeneSplicer scores for RefSeq and random sites")
+ggplot(merged_GS_data, aes(normSCORE)) + geom_histogram(aes(fill=src), alpha=0.5, binwidth=1, position="identity") + ylab("Count") + xlab("Score") + ggtitle("Distribution of GeneSplicer scores for RefSeq and random sites")
 
 #### SUMMARISE + ROC CURVE ####
 
 # total counts
 # percentages
 # is ROC possible when so many aren't even called?
-GS_ROC_results = matrix(ncol=7, nrow=length(seq(from = floor(min(merged_GS_data$normSCORE)), to = ceiling(max(merged_GS_data$normSCORE)), by = 0.0001)))
+GS_ROC_results = matrix(ncol=7, nrow=length(seq(from = floor(min(merged_GS_data$normSCORE)), to = ceiling(max(merged_GS_data$normSCORE)), by = 0.01)))
 # i is for indexing into results
 i = 1
-for(cutoff in seq(from = floor(min(merged_GS_data$normSCORE)), to = ceiling(max(merged_GS_data$normSCORE)), by=0.0001))
+for(cutoff in seq(from = floor(min(merged_GS_data$normSCORE)), to = ceiling(max(merged_GS_data$normSCORE)), by=0.01))
 {
   # called sites above the cutoff
-  tp = (length(merged_GS_data$normSCORE[merged_GS_data$normSCORE > cutoff])) / 1000
+  tp = length(merged_GS_data$normSCORE[merged_GS_data$normSCORE > cutoff & merged_GS_data$src == "REFSEQ"]) / 1000
   # any uncalled in RefSeq data are false negatives, as well as any below the cutoff
-  fn = (length(refseq_uncalled$SCORE) + length(merged_GS_data$normSCORE[merged_GS_data$normSCORE < cutoff])) / 1000 # (length(refseq_uncalled$SCORE) + length(refseq_called$SCORE[refseq_called$SCORE < cutoff])) / 1000
+  fn = length(merged_GS_data$SCORE[merged_GS_data$normSCORE < cutoff & merged_GS_data$src == "REFSEQ"]) / 1000 # (length(refseq_uncalled$SCORE) + length(refseq_called$SCORE[refseq_called$SCORE < cutoff])) / 1000
   # true negatives are the random sites scored below cutoff + random sites not called
-  tn = (length(random_uncalled$SCORE) + length(merged_GS_data$normSCORE[merged_GS_data$normSCORE < cutoff])) / 1000 # (length(random_uncalled$SCORE) + length(random_called$SCORE[random_called$SCORE < cutoff])) / 1000
+  tn = length(merged_GS_data$SCORE[merged_GS_data$normSCORE < cutoff & merged_GS_data$src == "RANDOM"]) / 1000 # (length(random_uncalled$SCORE) + length(random_called$SCORE[random_called$SCORE < cutoff])) / 1000
   # false positives are any called in random sites
-  fp = (length(merged_GS_data$normSCORE[merged_GS_data$normSCORE > cutoff])) /1000
+  fp = length(merged_GS_data$SCORE[merged_GS_data$normSCORE > cutoff & merged_GS_data$src == "RANDOM"]) /1000
   
   tpr = tp / (tp + fn) # sensitivity
   tnr = tn / (tn + fp) # specificity
@@ -116,6 +116,6 @@ for(cutoff in seq(from = floor(min(merged_GS_data$normSCORE)), to = ceiling(max(
 }
 GS_ROC_results <- data.frame(GS_ROC_results)
 
-ggplot(GS_ROC_results) + geom_line(aes(x=X1, y=X2), size=1) + xlab("False positive rate") + xlim(0,1) + ylab("True positive rate") + ylim(0,1) + ggtitle("MaxEntScan reciever operating characterstic curve")
+ggplot(GS_ROC_results) + geom_line(aes(x=X1, y=X2), size=1) + xlab("False positive rate") + xlim(0,1) + ylab("True positive rate") + ylim(0,1) + ggtitle("GeneSplicer reciever operating characterstic curve")
 
 ggplot(GS_ROC_results, aes(x=X3)) + geom_line(aes(y=X2, colour="TPR"), size=1) + geom_line(aes(y=X1, colour = "FPR"), size=1) + geom_line(aes(y=X4, colour="Accuracy"), size=1) + scale_colour_manual("", breaks=c("TPR", "FPR", "Accuracy"), values=c("TPR"="blue", "FPR"="green", "Accuracy"="red")) + xlab("cutoff") +ylab("") + ggtitle("Accuracy of GeneSplicer")
