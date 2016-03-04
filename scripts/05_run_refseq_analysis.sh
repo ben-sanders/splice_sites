@@ -13,7 +13,7 @@
 #################################
 
 # 1. Alamut batch
-# ---------------
+#################
 
 # Alamut batch wants data in tab delimited files, but not in BED format.
 # From the Alamut documentation, the fields are:
@@ -43,7 +43,7 @@
 # use sed to replace | with tabs. Output is also not sorted, so sorted by chrom
 # and position. This sorts by +ve chromosome order, so reverse strand genes will
 # have exon order reversed. Doubt that this matters.
-# database stores using +ve strand, so alamut throws and error for unexpected base (i.e complementary base) on -ve strand positions.
+# database stores using +ve strand, so alamut throws an error for unexpected base (i.e complementary base) on -ve strand positions.
 # awk line simply checks strand and complements -ve.
 
 cd ../refseq_sites
@@ -52,7 +52,9 @@ sqlite3 ../database/variantdb.db 'SELECT var_id, chrom, pos_start, ref_allele, a
 sed s/'|'/'\t'/g | \
 sort -k2,2 -k3n,3 | \
 awk 'BEGIN{FS="\t"; OFS="\t"}{if ($4 == "C") comp="G"; else if ($4=="G") comp="C"; else if ($4=="A") comp="T"; else comp="A"; if ($6 == "+") print $1,$2,$3,$4,$5,"1",$7; else print $1,$2,$3,comp,$5,"-1",$7}' \
-> input.refseq_sites.alamut
+> input.refseq.alamut
+
+#TODO: run alamut (WARNING: LONG RUNNING TIME)
 
 cd ../random_sites
 
@@ -60,12 +62,20 @@ sqlite3 ../database/variantdb.db 'SELECT var_id, chrom, pos_start, ref_allele, a
 sed s/'|'/'\t'/g | \
 sort -k2,2 -k3n,3 | \
 awk 'BEGIN{FS="\t"; OFS="\t"}{if ($4 == "C") comp="G"; else if ($4=="G") comp="C"; else if ($4=="A") comp="T"; else comp="A"; if ($6 == "+") print $1,$2,$3,$4,$5,"1",$7; else print $1,$2,$3,comp,$5,"-1",$7}' \
-> input.random_sites.alamut
+> input.random.alamut
 
-# now the input file is formatted correctly, run alamut batch on it
+#TODO: run alamut (WARNING: LONG RUNNING TIME)
+
+cd ../literature_sites
+
+sqlite3 ../database/variantdb.db 'SELECT var_id, chrom, pos_start, ref_allele, alt_allele, strand, transcript FROM variants WHERE source="RANDOM";' | \
+sed s/'|'/'\t'/g | \
+sort -k2,2 -k3n,3 | \
+awk 'BEGIN{FS="\t"; OFS="\t"}{if ($4 == "C") comp="G"; else if ($4=="G") comp="C"; else if ($4=="A") comp="T"; else comp="A"; if ($6 == "+") print $1,$2,$3,$4,$5,"1",$7; else print $1,$2,$3,comp,$5,"-1",$7}' \
+> input.literature.alamut
 
 # 2. SPIDEX
-# ---------
+###########
 
 # what is the SPIDEX input format? If it's the same as SPANR (the web-based,
 # on-the fly calculated version) then it's just vcf arranged:
@@ -80,29 +90,30 @@ cd ../refseq_sites
 sqlite3 ../database/variantdb.db 'SELECT chrom, pos_start, var_id, ref_allele, alt_allele FROM variants WHERE source = "REFSEQ";' | \
 sed s/'|'/'\t'/g | \
 sort -k2,2 -k3n,3 \
-> refseq_sites.vcf
+> refseq.vcf
 
 cd ../random_sites
 sqlite3 ../database/variantdb.db 'SELECT chrom, pos_start, var_id, ref_allele, alt_allele FROM variants WHERE source = "RANDOM";' | \
 sed s/'|'/'\t'/g | \
 sort -k2,2 -k3n,3 \
-> random_sites.vcf
+> random.vcf
+
+cd ../literature_sites
+sqlite3 ../database/variantdb.db 'SELECT chrom, pos_start, var_id, ref_allele, alt_allele FROM variants WHERE source = "LITERATURE";' | \
+sed s/'|'/'\t'/g | \
+sort -k2,2 -k3n,3 \
+> literature.vcf
 
 # 3. MutPredSplice
-# ----------------
+##################
 
 # MutPredSplice is a vcf format import, but I'm not sure if I'll actually use
 # it - needs a 300+GB database setting up from scratch!
 
-# web interface supports input in csv format:
-# CHROM,POS,STRAND,REF,ALT
-# or VCF as above (example file on website includes QUAL, FILTER, and INFO 
-# columns, not sure if it actually NEEDS them though...)
+# VCF as above is fine
 
-#TODO
-
-# 4. MESpy
-# --------
+# 4. MESpy and MaxEntScan online
+################################
 
 # MaxEntScan is already included in Alamut, but it might be nice to try out my
 # own implementation. Must be run on a per-sample basis though, so could be 
@@ -128,26 +139,51 @@ cd ../refseq_sites
 sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type, strand FROM variants WHERE source="REFSEQ";' | \
 sed s/"|"/"\t"/g | \
 awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 48, 23)"\t"substr($4, 48, 23)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 32, 23)"\t"substr($4, 32, 23)"\t"$5"\t"$6 }}' \
-> input.refseq_sites.mespy
+> input.refseq.mespy
+
+# split by type so can use in MaxEntScan online, and change to FASTA
+cat input.refseq.mespy | cut -f2,3,6 | grep "_don" | awk 'BEGIN{FS="\t"; OFS="\n"}{print ">"$1$3,$2}' > intermediate.refseq.MESdonors.fa
+python ../scripts/python/strandrevcomp.py intermediate.refseq.MESdonors.fa > input.refseq.MESdonors.fa
 
 # run MESpy
-python ../scripts/mespy/run_mespy.py input.refseq_sites.mespy > out.refseq_sites.mespy
+python ../scripts/mespy/run_mespy.py input.refseq.mespy > out.refseq.mespy
 
 # cleanup input files
-mv input.refseq_sites.mespy complete/
+mv input.refseq.mespy complete/
 
 cd ../random_sites
 
 sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type, strand FROM variants WHERE source="RANDOM";' | \
 sed s/"|"/"\t"/g | \
 awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 48, 23)"\t"substr($4, 48, 23)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 32, 23)"\t"substr($4, 32, 23)"\t"$5"\t"$6 }}' \
-> input.random_sites.mespy
+> input.random.mespy
+
+# split by type so can use in MaxEntScan online, and change to FASTA
+cat input.random.mespy | cut -f2,3,6 | grep "_don" | awk 'BEGIN{FS="\t"; OFS="\n"}{print ">"$1$3,$2}'  > intermediate.random.MESdonors.fa
+python ../scripts/python/strandrevcomp.py intermediate.random.MESdonors.fa > input.random.MESdonors.fa
 
 # run MESpy
-python ../scripts/mespy/run_mespy.py input.random_sites.mespy > out.random_sites.mespy
+python ../scripts/mespy/run_mespy.py input.random.mespy > out.random_sites.mespy
 
 # cleanup input files
-mv input.random_sites.mespy complete/
+mv input.random.mespy complete/
+
+cd ../literature_sites
+
+sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type, strand FROM variants WHERE source="LITERATURE";' | \
+sed s/"|"/"\t"/g | \
+awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 48, 23)"\t"substr($4, 48, 23)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 32, 23)"\t"substr($4, 32, 23)"\t"$5"\t"$6 }}' \
+> input.literature.mespy
+
+# split by type so can use in MaxEntScan online, and change to FASTA
+cat input.literature.mespy | cut -f2,3,6 | grep "_don" | awk 'BEGIN{FS="\t"; OFS="\n"}{print ">"$1$3,$2}'  > intermediate.literature.MESdonors.fa
+python ../scripts/python/strandrevcomp.py intermediate.literature.MESdonors.fa > input.literature.MESdonors.fa
+
+# run MESpy
+python ../scripts/mespy/run_mespy.py input.literature.mespy > out.literature_sites.mespy
+
+# cleanup input files
+mv input.literature.mespy complete/
 
 # mespy returns results as
 # DB_ID VAR_ID  HIGHEST_SCORING_POSITION    RANK_CHANGE SCORE_CHANGE(%)
@@ -164,7 +200,7 @@ mv input.random_sites.mespy complete/
 # 0.0 - 1.0, etc)
 
 # 5. GeneSplicer
-# --------------
+################
 
 # GeneSplicer takes fast inputs, but doesn't seem to account for multiple
 # samples - it concatenates them all together!?
@@ -178,7 +214,7 @@ mv input.random_sites.mespy complete/
 #TODO
 
 # 6. PWM
-# ------
+########
 
 # Check against the derived PWMs from the S&S analysis subsection
 # input format is very similary to MESpy.
@@ -188,27 +224,48 @@ cd ../refseq_sites
 sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type, strand FROM variants WHERE source="REFSEQ";' | \
 sed s/"|"/"\t"/g | \
 awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 50, 15)"\t"substr($4, 50, 15)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 38, 15)"\t"substr($4, 38, 15)"\t"$5"\t"$6 }}' \
-> input.refseq_sites.pwm
+> input.refseq.pwm
 
-python ../scripts/python/pwm_score.py input.refseq_sites.pwm > out.refseq_sites.pwm
+python ../scripts/python/pwm_score.py input.refseq.pwm > out.refseq.pwm
 
 # tidy up
-mv input.refseq_sites.pwm complete/
+mv input.refseq.pwm complete/
 
 cd ../random_sites
 
 sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type, strand FROM variants WHERE source="RANDOM";' | \
 sed s/"|"/"\t"/g | \
 awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 50, 15)"\t"substr($4, 50, 15)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 38, 15)"\t"substr($4, 38, 15)"\t"$5"\t"$6 }}' \
-> input.random_sites.pwm
+> input.random.pwm
 
-python ../scripts/python/pwm_score.py input.random_sites.pwm > out.random_sites.pwm
+python ../scripts/python/pwm_score.py input.random_sites.pwm > out.random.pwm
 
 # tidy up
-mv input.random_sites.pwm complete/
+mv input.random.pwm complete/
 
-################ R script and plotting ########################
+cd ../literature_sites
+
+sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type, strand FROM variants WHERE source="LITERATURE";' | \
+sed s/"|"/"\t"/g | \
+awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 50, 15)"\t"substr($4, 50, 15)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 38, 15)"\t"substr($4, 38, 15)"\t"$5"\t"$6 }}' \
+> input.literature.pwm
+
+python ../scripts/python/pwm_score.py input.literature_sites.pwm > out.literature.pwm
+
+# tidy up
+mv input.literature.pwm complete/
+
+# 7. NNSPLICE online FASTA
+##########################
+
+# For generic use with some web tools
+
 cd ../refseq_sites
 
-R < ../scripts/r/MES_plots.r --no-save
-R < ../scripts/r/genesplicer_plots.r --no-save
+# get the sequence info and process to the right lengths
+sqlite3 ../database/variantdb.db 'SELECT db_id, var_id, ref_seq, alt_seq, type, strand FROM variants WHERE source="REFSEQ";' | \
+sed s/"|"/"\t"/g | \
+awk 'BEGIN{FS="\\t"}{if ($6 == "-") { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 46, 9)"\t"substr($4, 46, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 48, 23)"\t"substr($4, 48, 23)"\t"$5"\t"$6 } else if ($6 == "+" ) { if ($5 == "don" ) print $1"\t"$2"\t"substr($3, 48, 9)"\t"substr($4, 48, 9)"\t"$5"\t"$6;  else print $1"\t"$2"\t"substr($3, 32, 23)"\t"substr($4, 32, 23)"\t"$5"\t"$6 }}' \
+> input.refseq.nnsplice.fa
+
+#########TODO : FINISH

@@ -19,6 +19,7 @@ hg19/
 *.*~
 
 # input files can be quite large, and are generated from the database anyway.
+# but literature variants are ok
 input.refseq*
 input.random*
 
