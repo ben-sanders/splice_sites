@@ -43,23 +43,26 @@
 # use sed to replace | with tabs. Output is also not sorted, so sorted by chrom
 # and position. This sorts by +ve chromosome order, so reverse strand genes will
 # have exon order reversed. Doubt that this matters.
+# database stores using +ve strand, so alamut throws and error for unexpected base (i.e complementary base) on -ve strand positions.
+# awk line simply checks strand and complements -ve.
 
 cd ../refseq_sites
 
 sqlite3 ../database/variantdb.db 'SELECT var_id, chrom, pos_start, ref_allele, alt_allele, strand, transcript FROM variants WHERE source="REFSEQ";' | \
 sed s/'|'/'\t'/g | \
-sort -k2,2 -k3n,3 \
+sort -k2,2 -k3n,3 | \
+awk 'BEGIN{FS="\t"; OFS="\t"}{if ($4 == "C") comp="G"; else if ($4=="G") comp="C"; else if ($4=="A") comp="T"; else comp="A"; if ($6 == "+") print $1,$2,$3,$4,$5,"1",$7; else print $1,$2,$3,comp,$5,"-1",$7}' \
 > input.refseq_sites.alamut
 
 cd ../random_sites
 
 sqlite3 ../database/variantdb.db 'SELECT var_id, chrom, pos_start, ref_allele, alt_allele, strand, transcript FROM variants WHERE source="RANDOM";' | \
 sed s/'|'/'\t'/g | \
-sort -k2,2 -k3n,3 \
+sort -k2,2 -k3n,3 | \
+awk 'BEGIN{FS="\t"; OFS="\t"}{if ($4 == "C") comp="G"; else if ($4=="G") comp="C"; else if ($4=="A") comp="T"; else comp="A"; if ($6 == "+") print $1,$2,$3,$4,$5,"1",$7; else print $1,$2,$3,comp,$5,"-1",$7}' \
 > input.random_sites.alamut
-# now the input file is formatted correctly, run alamut batch on it
-# NOTE: comment out until alamut batch is actually installed!
 
+# now the input file is formatted correctly, run alamut batch on it
 
 # 2. SPIDEX
 # ---------

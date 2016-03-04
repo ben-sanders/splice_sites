@@ -12,19 +12,15 @@ hg19/*.fa
 # until it's fully automated, the random_sites folder contains some massive files
 random_sites/
 
-# hg19 fodler contains links, not files, but just to be safe
+# hg19 folder contains links, not files, but just to be safe
 hg19/
 
 # Try to ignore temp files from gedit
 *.*~
 
-# input files for mespy can be quite large
-*.mespy
-*.mespy.input
-
-# and others:
-*.refseq
-*.alamut
+# input files can be quite large, and are generated from the database anyway.
+input.refseq*
+input.random*
 
 # sql upload files are pretty big, and can generate themselves
 *upload.sql

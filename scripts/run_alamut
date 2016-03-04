@@ -1,0 +1,31 @@
+in refseq_sites folder
+
+for refseq - account for transcript and strand
+./../../project_tools/alamut-batch-standalone-1.4.4/alamut-batch --in input.refseq.alamut --ann output.refseq.alamut --unann failed.refseq.alamut --strand --spectrans --nomispred --ignoreInputErrors
+
+for random - may have problems, but ideally just want it to score off the sequence! no transcript info
+./../../project_tools/alamut-batch-standalone-1.4.4/alamut-batch --in input.random.alamut --ann output.random.alamut --unann failed.random.alamut --strand --nomispred --ignoreInputErrors
+
+
+post-run processing
+
+# awk checks that the reported gene and the original ID match (despite using specific transcript option, some have more than one gene analysed...
+# column order is:
+# id	gene	wtMaxEntScore	wtNNSScore	wtGSScore	wtHSFScore
+
+# write a header
+echo -e "ID\tGENE\twtSSF\twtMAXENT\tmwNNSplice\twtGeneSplicer\twtHSF\tvarSSF\tvarMAXENT\tvarNNSplice\tvarGeneSplicer\tvarHSF" > processed.output.refseq.alamut
+# then append data
+cat output.refseq.alamut | cut -f1,5,33,34,35,36,37,38,39,40,41,42 | awk 'BEGIN{FS="[\t_]"; OFS="\t"}{if ($1 == $4) print}' >> samegene.refseq.alamut
+
+# Do for random
+# random won't have a transcript in the ID to check against, so should probably just make sure that each one is only present once
+
+# RANDOM DOESN'T WORK - alamut reports scores at nearest splice site, not at the variant site
+# will need to either find a way to use the same tools to look directly at sequence of interest (which is how they should be working??)
+# OR could use the variant scores from RefSeq (which are changed in the +-1 position) and look for differences between those scores.
+
+# write a header
+echo -e "ID\tGENE\twtMAXENT\tmwNNSplice\twtGeneSplicer\twtHSF" > processed.output.random.alamut
+# then append data
+cat output.random.alamut | cut -f1,5,34,35,36,37 | awk 'BEGIN{FS="[\t_]"; OFS="\t"}{if ($1 == $4) print}' >> processed.output.random.alamut
