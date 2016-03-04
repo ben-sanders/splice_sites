@@ -9,9 +9,6 @@ hg19/*.fa
 *.allexons*
 *.nosplicesites*
 
-# until it's fully automated, the random_sites folder contains some massive files
-random_sites/
-
 # hg19 folder contains links, not files, but just to be safe
 hg19/
 

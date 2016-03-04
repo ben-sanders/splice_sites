@@ -1,0 +1,11 @@
+This folder is used to the generation and analysis of random non-splice sites.
+
+The random sites are selected by finding an equal number of AG and GT dinucleotides more than 20(?) bp from a true splice site
+
+combined.nonsplicesites is the files used to generate SQL for database upload. It should be deleted/ignored
+
+There are two main types of file:
+	input.random_sites.<tool>
+	out.random_sites.<tool>
+
+and a vcf file, random_sites.vcf
