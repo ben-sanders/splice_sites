@@ -23,5 +23,8 @@ input.random*
 # sql upload files are pretty big, and can generate themselves
 *upload.sql
 
+# combined output files are big, just use the ones split by site type
+out.*
+
 # same for any generated vcfs
 *.vcf
